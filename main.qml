@@ -79,6 +79,11 @@ ApplicationWindow {
                     onCheckedChanged: modelData.generateProperty = this.checked
                 }
                 CheckBox {
+                    text: "Member"
+                    checked: modelData.generateMember
+                    onCheckedChanged: modelData.generateMember = this.checked
+                }
+                CheckBox {
                     id: readOption
                     text: "Read"
                     checked: modelData.generateRead
@@ -101,64 +106,8 @@ ApplicationWindow {
         Button {
             text: "Generate"
             onClicked: {
-//                var qproperty = "";
-//                var readMethod = "";
-//                var writeMethod = "";
-
-//                var className = classNameText.text;
-
-//                var type = typeSelect.currentText;
-//                var name = fieldNameText.text;
-//                var capitalName = name.toString().substring(0, 1).toUpperCase() + name.toString().substring(1, name.length);
-//                var memberName = "m_" + name;
-
-//                qproperty += "Q_PROPERTY(" + type + " " + name + " MEMBER " + memberName;
-
-//                if(readOption.checked) {
-//                    qproperty += " READ " + name;
-
-//                    readMethod += type + " " + className + "::" + name + "() {\n";
-//                    readMethod += "    return " + memberName + ";\n";
-//                    readMethod += "}\n\n";
-//                }
-
-//                if(writeOption.checked) {
-//                    qproperty += " WRITE set" + capitalName;
-
-//                    writeMethod += "void " + className + "::set" + capitalName + "(" + type + " value) {\n";
-//                    writeMethod += "    if(" + memberName + " != value) {\n";
-//                    writeMethod += "        " + memberName + " = value;\n";
-//                    writeMethod += "        " + logNameText.text + "(" + memberName + ", \"" + name + "\");\n";
-//                    writeMethod += "        " + name + "Changed();\n";
-//                    writeMethod += "    }\n";
-//                    writeMethod += "}\n\n";
-//                }
-
-//                qproperty += " NOTIFY " + name + "Changed)\n\n";
-
-//                var result = "";
-//                if(propertyOption.checked) {
-//                    result += qproperty;
-//                }
-//                if(readOption.checked) {
-//                    result += readMethod;
-//                }
-//                if(writeOption.checked) {
-//                    result += writeMethod;
-//                }
-
-//                if(propertyOption.checked) {
-//                    result += "void " + name + "Changed(" + type + ");\n\n";
-//                }
-
-//                result += type + " " + memberName + ";\n\n";
-
-
-                resultText.text = definition.generateHeader();
-                resultText.text += "\n\n\n";
-                resultText.text += definition.generateSource();
-                resultText.forceActiveFocus();
-                resultText.selectAll();
+                headerText.text = definition.generateHeader();
+                sourceText.text = definition.generateSource();
             }
         }
     }
@@ -166,10 +115,22 @@ ApplicationWindow {
 
 
     TextArea {
-        id: resultText
+        id: headerText
         anchors.top: mainColumn.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        anchors.rightMargin: parent.width / 2
+        onFocusChanged: if(this.focus) this.selectAll()
+    }
+
+    TextArea {
+        id: sourceText
+        anchors.top: mainColumn.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.leftMargin: parent.width / 2
+        anchors.right: parent.right
+        onFocusChanged: if(this.focus) this.selectAll()
     }
 }

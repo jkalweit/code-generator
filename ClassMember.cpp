@@ -22,6 +22,10 @@ QString ClassMember::capitalName() {
 }
 
 QString ClassMember::getMemberDeclaration() {
+    if(!m_generateMember) {
+        return "";
+    }
+
     return "    " + m_type + " " + memberName() + ";\n";
 }
 
@@ -30,7 +34,10 @@ QString ClassMember::getPropertyDeclaration() {
         return "";
     }
 
-    QString result = "    Q_PROPERTY(" + m_type + " " + m_name + " MEMBER " + memberName();
+    QString result = "    Q_PROPERTY(" + m_type + " " + m_name;
+    if(m_generateMember) {
+        result += " MEMBER " + memberName();
+    }
     if(m_generateRead) {
         result += " READ " + m_name;
     }
@@ -75,7 +82,11 @@ QString ClassMember::getReadMethod(QString className) {
 
     QString result = "";
     result += m_type + " " + className + "::" + m_name + "() {\n";
-    result += "    return " + memberName() + ";\n";
+    if(m_generateMember) {
+        result += "    return " + memberName() + ";\n";
+    } else {
+        result += "    // TODO: Implement Read\n";
+    }
     result += "}\n";
     result += "\n";
     return result;
@@ -91,13 +102,18 @@ QString ClassMember::getWriteMethod(QString className, QString logPropertyName) 
     QString result = "";
 
     result += "void " + className + "::set" + capitalName() + "(" +     m_type + " value) {\n";
-    result += "    if(" + memberName() + " != value) {\n";
-    result += "        " + memberName() + " = value;\n";
-    if(logPropertyName != "") {
-        result += "        " + logPropertyName + "(" + memberName() + ", \"" + m_name + "\");\n";
+    if(m_generateMember) {
+        result += "    if(" + memberName() + " != value) {\n";
+        result += "        " + memberName() + " = value;\n";
+        if(logPropertyName != "") {
+            result += "        " + logPropertyName + "(" + memberName() + ", \"" + m_name + "\");\n";
+        }
+        result += "        " + m_name + "Changed(" + memberName() + ");\n";
+        result += "    }\n";
+    } else {
+        result += "    // TODO: Implement Write\n";
     }
-    result += "        " + m_name + "Changed(" + memberName() + ");\n";
-    result += "    }\n";
+
     result += "}\n";
     result += "\n";
 
