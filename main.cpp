@@ -4,11 +4,13 @@
 #include <QQmlContext>
 #include "ClassDefinition.h"
 #include "ClassMember.h"
+#include "ClassListMember.h"
 
 int main(int argc, char *argv[])
 {
     qmlRegisterType<ClassDefinition>("FreePos", 1, 0, "ClassDefinition");
     qmlRegisterType<ClassMember>("FreePos", 1, 0, "ClassMember");
+    qmlRegisterType<ClassListMember>("FreePos", 1, 0, "ClassListMember");
 
     ClassDefinition definition(0, "MyClass");
 

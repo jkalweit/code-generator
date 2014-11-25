@@ -18,6 +18,17 @@ ClassMember* ClassDefinition::newClassMember() {
     return member;
 }
 
+QQmlListProperty<ClassListMember> ClassDefinition::classListMembers() {
+    return QQmlListProperty<ClassListMember>(this, m_classListMembers);
+}
+
+ClassListMember* ClassDefinition::newClassListMember() {
+    ClassListMember *member = new ClassListMember(this, 0, "field", "className", true, true, true, true, true, true);
+    m_classListMembers.append(member);
+    classListMembersChanged(classListMembers());
+    return member;
+}
+
 QString ClassDefinition::generateHeader() {
     QString result = "";
     result += "#ifndef " + m_name.toUpper() + "_H\n";
@@ -38,6 +49,10 @@ QString ClassDefinition::generateHeader() {
     result += "\n";
     result += "    Q_OBJECT\n";
     for(ClassMember *member : m_classMembers) {
+        result += member->getPropertyDeclaration();
+    }
+    result += "\n";
+    for(ClassListMember *member : m_classListMembers) {
         result += member->getPropertyDeclaration();
     }
     result += "public:\n";
@@ -66,9 +81,23 @@ QString ClassDefinition::generateHeader() {
     for(ClassMember *member : m_classMembers) {
         result += member->getWriteMethodDeclaration();
     }
+
+    result += "\n";
+    result += "\n";
+
+    for(ClassListMember *member : m_classListMembers) {
+        result += member->getAccessorsDeclaration();
+        result += "\n";
+    }
+
+
     result += "\n";
     result += "signals:\n";
     for(ClassMember *member : m_classMembers) {
+        result += member->getNotifyDeclaration();
+    }    
+    result += "\n";
+    for(ClassListMember *member : m_classListMembers) {
         result += member->getNotifyDeclaration();
     }
     result += "\n";
@@ -77,6 +106,11 @@ QString ClassDefinition::generateHeader() {
     result += "\n";
     result += "private:\n";
     for(ClassMember *member : m_classMembers) {
+        result += member->getMemberDeclaration();
+    }
+
+    result += "\n";
+    for(ClassListMember *member : m_classListMembers) {
         result += member->getMemberDeclaration();
     }
 

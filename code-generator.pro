@@ -6,7 +6,8 @@ QT += qml quick widgets
 
 SOURCES += main.cpp \
     ClassMember.cpp \
-    ClassDefinition.cpp
+    ClassDefinition.cpp \
+    ClassListMember.cpp
 
 RESOURCES += qml.qrc
 
@@ -18,4 +19,5 @@ include(deployment.pri)
 
 HEADERS += \
     ClassMember.h \
-    ClassDefinition.h
+    ClassDefinition.h \
+    ClassListMember.h

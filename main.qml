@@ -103,6 +103,59 @@ ApplicationWindow {
             onClicked: definition.newClassMember()
         }
 
+        Repeater {
+            model: definition.classListMembers
+            Row {
+                TextField {
+                    id: ckassNameText
+                    text: modelData.className
+                    onFocusChanged: if(this.focus) this.selectAll();
+                    onTextChanged: modelData.className = this.text
+                }
+                TextField {
+                    id: fieldNameText
+                    text: modelData.name
+                    onFocusChanged: if(this.focus) this.selectAll();
+                    onTextChanged: modelData.name = this.text
+                }
+                CheckBox {
+                    id: propertyOption
+                    text: "Property"
+                    checked: modelData.generateProperty
+                    onCheckedChanged: modelData.generateProperty = this.checked
+                }
+                CheckBox {
+                    text: "Member"
+                    checked: modelData.generateMember
+                    onCheckedChanged: modelData.generateMember = this.checked
+                }
+                CheckBox {
+                    text: "Add"
+                    checked: modelData.generateAdd
+                    onCheckedChanged: modelData.generateAdd = this.checked
+                }
+                CheckBox {
+                    text: "Get"
+                    checked: modelData.generateGet
+                    onCheckedChanged: modelData.generateGet = this.checked
+                }
+                CheckBox {
+                    text: "Remove"
+                    checked: modelData.generateRemove
+                    onCheckedChanged: modelData.generateRemove = this.checked
+                }
+                CheckBox {
+                    text: "QList"
+                    checked: modelData.generateQList
+                    onCheckedChanged: modelData.generateQList = this.checked
+                }
+            }
+        }
+
+        Button {
+            text: "Add List Member"
+            onClicked: definition.newClassListMember()
+        }
         Button {
             text: "Generate"
             onClicked: {
