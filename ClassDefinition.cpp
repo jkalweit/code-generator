@@ -12,22 +12,38 @@ QQmlListProperty<ClassMember> ClassDefinition::classMembers() {
 }
 
 ClassMember* ClassDefinition::newClassMember() {
-    ClassMember *member = new ClassMember(this, "field", "QString");
-    m_classMembers.append(member);
-    classMembersChanged(classMembers());
+    ClassMember *member = new ClassMember(this, "field", "QString", true, true, true, true);
+    addClassMember(member);
     return member;
 }
+
+void ClassDefinition::addClassMember(ClassMember *value) {
+    m_classMembers.append(value);
+    classMembersChanged(classMembers());
+}
+
+
+
+
 
 QQmlListProperty<ClassListMember> ClassDefinition::classListMembers() {
     return QQmlListProperty<ClassListMember>(this, m_classListMembers);
 }
 
 ClassListMember* ClassDefinition::newClassListMember() {
-    ClassListMember *member = new ClassListMember(this, 0, "field", "className", true, true, true, true, true, true);
-    m_classListMembers.append(member);
-    classListMembersChanged(classListMembers());
+    ClassListMember *member = new ClassListMember(this, 0, "item", "items", "itemType", true, true, true, true, true, true);
+    addClassListMember(member);
     return member;
 }
+
+void ClassDefinition::addClassListMember(ClassListMember *value) {
+    m_classListMembers.append(value);
+    classListMembersChanged(classListMembers());
+}
+
+
+
+
 
 QString ClassDefinition::generateHeader() {
     QString result = "";
@@ -38,6 +54,9 @@ QString ClassDefinition::generateHeader() {
     result += "#include <QQmlListProperty>\n";
     if(m_baseClassName != "QObject") {
         result += "#include \"" + m_baseClassName + ".h\"\n";
+    }
+    for(ClassListMember *member : m_classListMembers) {
+        result += "#include \"" + member->property("className").toString() + ".h\"\n";
     }
     result += "\n";
     result += "class " + m_name;
@@ -152,6 +171,10 @@ QString ClassDefinition::generateSource() {
     result += "\n";
     for(ClassMember *member : m_classMembers) {
         result += member->getWriteMethod(m_name, m_logPropertyName);
+    }
+    result += "\n";
+    for(ClassListMember *member : m_classListMembers) {
+        result += member->getAccessorsSource(m_name);
     }
     result += "\n";
     return result;

@@ -1,7 +1,7 @@
 #include "ClassMember.h"
 
-ClassMember::ClassMember(QObject *parent, QString name, QString type) :
-    QObject(parent), m_name(name), m_type(type), m_generateMember(true), m_generateProperty(true), m_generateRead(true), m_generateWrite(true)
+ClassMember::ClassMember(QObject *parent, QString name, QString type, bool generateMember, bool generateProperty, bool generateRead, bool generateWrite) :
+    QObject(parent), m_name(name), m_type(type), m_generateMember(generateMember), m_generateProperty(generateProperty), m_generateRead(generateRead), m_generateWrite(generateWrite)
 {
 }
 

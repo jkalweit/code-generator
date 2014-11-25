@@ -21,9 +21,11 @@ public:
 
     QQmlListProperty<ClassMember> classMembers();
     Q_INVOKABLE ClassMember* newClassMember();
+    void addClassMember(ClassMember *value);
 
-    QQmlListProperty<ClassListMember> classListMembers();
+    QQmlListProperty<ClassListMember> classListMembers();    
     Q_INVOKABLE ClassListMember* newClassListMember();
+    void addClassListMember(ClassListMember *value);
 
     Q_INVOKABLE QString generateHeader();
     Q_INVOKABLE QString generateSource();

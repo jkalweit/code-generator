@@ -12,9 +12,17 @@ int main(int argc, char *argv[])
     qmlRegisterType<ClassMember>("FreePos", 1, 0, "ClassMember");
     qmlRegisterType<ClassListMember>("FreePos", 1, 0, "ClassListMember");
 
-    ClassDefinition definition(0, "MyClass");
 
     QApplication app(argc, argv);
+
+    ClassDefinition definition(&app, "MyClass");
+
+    definition.addClassMember(new ClassMember(&definition, "id", "quint32", true, true, true, false));
+    definition.addClassMember(new ClassMember(&definition, "name", "QString", true, true, true, true));
+
+    definition.addClassListMember(new ClassListMember(&definition, 0, "item", "items", "Type", true, true, true, true, true, true));
+
+
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("definition", (QObject*)&definition);

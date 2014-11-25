@@ -13,7 +13,7 @@ class ClassMember : public QObject
     Q_PROPERTY(bool generateRead MEMBER m_generateRead NOTIFY generateReadChanged)
     Q_PROPERTY(bool generateWrite MEMBER m_generateWrite NOTIFY generateWriteChanged)
 public:
-    explicit ClassMember(QObject *parent = 0, QString name = "", QString type = "");
+    explicit ClassMember(QObject *parent = 0, QString name = "", QString type = "", bool generateMember = false, bool generateProperty = false, bool generateRead = false, bool generateWrite = false);
 
     QString name();
     QString type();

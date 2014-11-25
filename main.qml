@@ -107,19 +107,21 @@ ApplicationWindow {
             model: definition.classListMembers
             Row {
                 TextField {
-                    id: ckassNameText
                     text: modelData.className
                     onFocusChanged: if(this.focus) this.selectAll();
                     onTextChanged: modelData.className = this.text
                 }
                 TextField {
-                    id: fieldNameText
                     text: modelData.name
                     onFocusChanged: if(this.focus) this.selectAll();
                     onTextChanged: modelData.name = this.text
                 }
+                TextField {
+                    text: modelData.namePlural
+                    onFocusChanged: if(this.focus) this.selectAll();
+                    onTextChanged: modelData.namePlural = this.text
+                }
                 CheckBox {
-                    id: propertyOption
                     text: "Property"
                     checked: modelData.generateProperty
                     onCheckedChanged: modelData.generateProperty = this.checked
