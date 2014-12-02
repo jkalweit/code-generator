@@ -119,3 +119,13 @@ QString ClassMember::getWriteMethod(QString className, QString logPropertyName) 
 
     return result;
 }
+
+QStringList ClassMember::serialize() {
+    QStringList vals;
+    vals << "ClassMember" << m_name << m_type
+        << QString::number(m_generateMember)
+        << QString::number(m_generateProperty)
+        << QString::number(m_generateRead)
+        << QString::number(m_generateWrite);
+    return vals;
+}

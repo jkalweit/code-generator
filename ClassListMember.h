@@ -33,6 +33,8 @@ public:
     QString getAccessorsDeclaration();
     QString getAccessorsSource(QString memberOf);
 
+    QStringList serialize();
+
 signals:
     void idChanged(quint32);
     void nameChanged(QString);

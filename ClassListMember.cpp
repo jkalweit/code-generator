@@ -29,7 +29,7 @@ QString ClassListMember::getMemberDeclaration() {
         return "";
     }
 
-    return "     QList<" + m_className + "*> " + memberName() + ";\n";
+    return "    QList<" + m_className + "*> " + memberName() + ";\n";
 }
 
 QString ClassListMember::getPropertyDeclaration() {
@@ -54,18 +54,18 @@ QString ClassListMember::getAccessorsDeclaration() {
     result += "     " + type() + " " + m_namePlural + "();\n";
 
     if(m_generateQList) {
-        result += "     QList<" + m_className + "*> " + m_namePlural + "List();\n";
+        result += "    QList<" + m_className + "*> " + m_namePlural + "List();\n";
     }
 
     if(m_generateAdd) {
-        result += "     Q_INVOKABLE " + m_className + "* add" + capitalName() + "();\n";
-        result += "     void add" + capitalName() + "(" + m_className + " *value);\n";
+        result += "    Q_INVOKABLE " + m_className + "* add" + capitalName() + "();\n";
+        result += "    void add" + capitalName() + "(" + m_className + " *value);\n";
     }
     if(m_generateGet) {
-        result += "     Q_INVOKABLE " + m_className + "* get" + capitalName() + "(quint32 id);\n";
+        result += "    Q_INVOKABLE " + m_className + "* get" + capitalName() + "(quint32 id);\n";
     }
     if(m_generateRemove) {
-        result += "     Q_INVOKABLE void remove" + capitalName() + "(quint32 id);\n";
+        result += "    Q_INVOKABLE void remove" + capitalName() + "(quint32 id);\n";
     }
 
     return result;
@@ -111,7 +111,7 @@ QString ClassListMember::getAccessorsSource(QString memberOf) {
 
     if(m_generateRemove) {
         result += "void " + memberOf + "::remove" + capitalName() + "(quint32 id) {\n";
-        result += "    for(int i = 0; i < " + memberName() + ".length; i++) {\n";
+        result += "    for(int i = 0; i < " + memberName() + ".length(); i++) {\n";
         result += "        if(" + memberName() + "[i]->property(\"id\").toUInt() == id) {\n";
         result += "             " + m_className + " *item = " + memberName() + "[i];\n";
         result += "             " + memberName() + ".removeAt(i);\n";
@@ -124,4 +124,19 @@ QString ClassListMember::getAccessorsSource(QString memberOf) {
     }
 
     return result;
+}
+
+
+QStringList ClassListMember::serialize() {
+    QStringList vals;
+    vals << "ClassListMember"
+        << m_name << m_namePlural << m_className
+        << QString::number(m_generateProperty)
+        << QString::number(m_generateMember)
+        << QString::number(m_generateAdd)
+        << QString::number(m_generateGet)
+        << QString::number(m_generateRemove)
+        << QString::number(m_generateQList);
+
+    return vals;
 }

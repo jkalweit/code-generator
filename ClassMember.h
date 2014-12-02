@@ -2,6 +2,7 @@
 #define CLASSMEMBER_H
 
 #include <QObject>
+#include <QStringList>
 
 class ClassMember : public QObject
 {
@@ -28,6 +29,8 @@ public:
 
     QString getReadMethod(QString className);
     QString getWriteMethod(QString className, QString logPropertyName);
+
+    QStringList serialize();
 
 signals:
     void nameChanged(QString);

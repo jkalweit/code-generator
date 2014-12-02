@@ -30,6 +30,14 @@ public:
     Q_INVOKABLE QString generateHeader();
     Q_INVOKABLE QString generateSource();
 
+    Q_INVOKABLE void readFile();
+    Q_INVOKABLE void writeFile();
+
+    QString serializeList(QStringList vals);
+    QStringList deserializeList(QString vals);
+    QString escapeString(QString val);
+    QString unEscapeString(QString val);
+
 signals:
     void nameChanged(QString);
     void baseClassNameChanged(QString);

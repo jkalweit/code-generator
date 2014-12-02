@@ -31,6 +31,14 @@ ApplicationWindow {
                 onFocusChanged: if(this.focus) this.selectAll()
                 onTextChanged: definition.logPropertyName = this.text
             }
+            Button {
+                text: "Save"
+                onClicked: definition.writeFile()
+            }
+            Button {
+                text: "Load"
+                onClicked: definition.readFile()
+            }
 //            TextField {
 //                id: logNameText
 //                text: "logFixedCostsPropertyChanged"
@@ -43,6 +51,8 @@ ApplicationWindow {
             Row {
                 ComboBox {
                     id: typeSelect
+                    editable: true
+                    property bool ready: false
                     model: ["QString", "quint32", "float", "bool"]
 //                    onCurrentTextChanged: {
 //                        if(this.status === Component.Ready) {
@@ -51,9 +61,18 @@ ApplicationWindow {
 //                            console.log(modelData.type);
 //                        }
 //                    }
+                    onFocusChanged: if(this.focus) this.selectAll();
                     onActivated: {
                         modelData.type = this.textAt(index);
+                        console.log("activated: ", this.textAt(index), modelData.type)
+                    }                    
+                    onEditTextChanged: {
+                        if(ready) {
+                            modelData.type = this.editText;
+                            console.log("editText: ", this.editText, modelData.type)
+                        }
                     }
+
                     Component.onCompleted: {
                         if(modelData.type === "QString") {
                             this.currentIndex = 0;
@@ -63,7 +82,10 @@ ApplicationWindow {
                             this.currentIndex = 2;
                         } else if(modelData.type === "bool") {
                             this.currentIndex = 3;
+                        } else {
+                            this.editText = modelData.type
                         }
+                        ready = true;
                     }
                 }
                 TextField {

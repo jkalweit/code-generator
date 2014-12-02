@@ -1,5 +1,7 @@
 #include "ClassDefinition.h"
 #include <QDebug>
+#include <QDir>
+#include <QFile>
 
 ClassDefinition::ClassDefinition(QObject *parent, QString name, QString baseClassName, QString logPropertyName) :
     QObject(parent), m_name(name), m_baseClassName(baseClassName), m_logPropertyName(logPropertyName)
@@ -55,9 +57,26 @@ QString ClassDefinition::generateHeader() {
     if(m_baseClassName != "QObject") {
         result += "#include \"" + m_baseClassName + ".h\"\n";
     }
+
+    QStringList includes;
+    for(ClassMember *member : m_classMembers) {
+        QString type = member->type();
+        if(!(type == "QString" || type == "bool" || type == "quint32" || type == "float")) {
+
+            if(type.right(1) == "*") {
+                type = type.left(type.length() - 1);
+            }
+
+            if(!includes.contains(type)) {
+                result += "#include \"" + type + ".h\"\n";
+                includes.append(type);
+            }
+        }
+    }
     for(ClassListMember *member : m_classListMembers) {
         result += "#include \"" + member->property("className").toString() + ".h\"\n";
     }
+
     result += "\n";
     result += "class " + m_name;
     if(m_baseClassName != "") {
@@ -83,8 +102,10 @@ QString ClassDefinition::generateHeader() {
                 result += "\"\"";
             } else if(member->type() == "bool") {
                 result += "false";
-            } else {
+            } else if(member->type() == "quint32" || member->type() == "float") {
                 result += "0";
+            } else {
+                result += "nullptr";
             }
         }
     }
@@ -179,3 +200,92 @@ QString ClassDefinition::generateSource() {
     result += "\n";
     return result;
 }
+
+void ClassDefinition::readFile() {
+
+    m_classMembers.clear();
+    classMembersChanged(classMembers());
+
+    m_classListMembers.clear();
+    classListMembersChanged(classListMembers());
+
+    QFile file("./data/" + m_name + ".txt");
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream in(&file);
+
+
+    while(!in.atEnd()) {
+        QString line = in.readLine();
+        int delimit = line.indexOf(":");
+        QString command = line.mid(0, delimit);
+        QString payload = line.mid(delimit+1, line.length() - delimit);
+        QStringList split = deserializeList(payload);
+
+        qDebug() << command << ": " << payload;
+
+        if(command == "ClassDefinition") {
+            m_name = split[0];
+            m_baseClassName = split[1];
+            m_logPropertyName = split[2];
+        } else if(command == "ClassMember") {
+            addClassMember(new ClassMember(this, split[0], split[1], split[2].toUInt(), split[3].toUInt(), split[4].toUInt(), split[5].toUInt()));
+        } else if(command == "ClassListMember") {
+            addClassListMember(new ClassListMember(this, 0, split[0], split[1], split[2], split[3].toUInt(), split[4].toUInt(), split[5].toUInt(), split[6].toUInt(), split[7].toUInt(), split[8].toUInt()));
+        } else {
+            qDebug() << "   UNKNOWN COMMAND: " << command << payload;
+        }
+    }
+}
+
+void ClassDefinition::writeFile() {
+
+    QDir().mkdir("data");
+
+    QFile file("./data/" + m_name + ".txt");
+
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    QStringList vals;
+    vals << "ClassDefinition" << m_name << m_baseClassName << m_logPropertyName;
+    out << serializeList(vals) << endl;
+
+    for(ClassMember *member : m_classMembers) {
+        out << serializeList(member->serialize()) << endl;
+    }
+
+    for(ClassListMember *member : m_classListMembers) {
+        out << serializeList(member->serialize()) << endl;
+    }
+
+    file.close();
+
+}
+
+QString ClassDefinition::serializeList(QStringList vals) {
+    QString result = "";
+    for(QString val : vals) {
+        if(result != "")
+            result += ":";
+        result += escapeString(val);
+    }
+    return result;
+}
+
+QStringList ClassDefinition::deserializeList(QString vals) {
+    QStringList input = vals.split(":");
+    QStringList result;
+    for(QString val : input) {
+        result << unEscapeString(val);
+    }
+    return result;
+}
+
+QString ClassDefinition::escapeString(QString val) {
+    return val.replace("\n", "\\n").replace(":", "\\!");
+}
+
+QString ClassDefinition::unEscapeString(QString val) {
+    return val.replace("\\n", "\n").replace("\\!", ":");
+}
+
