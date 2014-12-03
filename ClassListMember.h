@@ -25,6 +25,7 @@ public:
     QString memberName();
     QString capitalName();
     QString notifyName();
+    QString currIdName();
 
     QString getMemberDeclaration();
     QString getPropertyDeclaration();

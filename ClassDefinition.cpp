@@ -182,6 +182,11 @@ QString ClassDefinition::generateSource() {
             result += ", " + member->memberName() + "(" + member->name() + ")";
         }
     }
+    for(ClassListMember *member : m_classListMembers) {
+        if(member->property("generateMember").toBool()) {
+            result += ", " + member->currIdName() + "(0)";
+        }
+    }
     result += "\n";
     result += "{\n";
     result += "}\n";

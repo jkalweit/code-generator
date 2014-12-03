@@ -24,12 +24,21 @@ QString ClassListMember::notifyName() {
     return m_namePlural + "Changed";
 }
 
+QString ClassListMember::currIdName() {
+    return "m_" + m_name + "CurrId";
+}
+
+
 QString ClassListMember::getMemberDeclaration() {
     if(!m_generateMember) {
         return "";
     }
 
-    return "    QList<" + m_className + "*> " + memberName() + ";\n";
+    QString result = "";
+    result += "    QList<" + m_className + "*> " + memberName() + ";\n";
+    result += "    quint32 " + currIdName() + ";\n";
+
+    return result;
 }
 
 QString ClassListMember::getPropertyDeclaration() {
@@ -51,7 +60,7 @@ QString ClassListMember::getNotifyDeclaration() {
 QString ClassListMember::getAccessorsDeclaration() {
     QString result = "";
 
-    result += "     " + type() + " " + m_namePlural + "();\n";
+    result += "    " + type() + " " + m_namePlural + "();\n";
 
     if(m_generateQList) {
         result += "    QList<" + m_className + "*> " + m_namePlural + "List();\n";
@@ -75,25 +84,29 @@ QString ClassListMember::getAccessorsSource(QString memberOf) {
     QString result = "";
 
     result += type() + " " + memberOf + "::" + m_namePlural + "() {\n";
-    result += "     return " + type() + "(this, " + memberName() + ");\n";
+    result += "    return " + type() + "(this, " + memberName() + ");\n";
     result += "}\n";
     result += "\n";
 
     if(m_generateQList) {
         result += "QList<" + m_className + "*> " + memberOf + "::" + m_namePlural + "List() {\n";
-        result += "     return " + memberName() + ";\n";
+        result += "    return " + memberName() + ";\n";
         result += "}\n";
         result += "\n";
     }
 
     if(m_generateAdd) {
         result += m_className + "* " + memberOf + "::add" + capitalName() + "() {\n";
-        result += "        // TODO: Implement Add\n";
+        result += "    // TODO: Implement Add\n";
+        result += "    " + m_className + " *obj = new " + m_className + "(this, ++" + currIdName() + ");\n";
+        result += "    add" + capitalName() + "(obj);\n";
+        result += "    return obj;\n";
         result += "}\n";
         result += "\n";
         result += "void " + memberOf + "::add" + capitalName() + "(" + m_className + " *value) {\n";
-        result += "     " + memberName() + ".append(value);\n";
-        result += "     " + notifyName() + "(" + m_namePlural + "());\n";
+        result += "    if(value->id() > " + currIdName() + ") " + currIdName() + " = value->id();\n";
+        result += "    " + memberName() + ".append(value);\n";
+        result += "    " + notifyName() + "(" + m_namePlural + "());\n";
         result += "}\n";
         result += "\n";
     }
@@ -101,8 +114,8 @@ QString ClassListMember::getAccessorsSource(QString memberOf) {
         result += m_className + "* " + memberOf + "::get" + capitalName() + "(quint32 id) {\n";
         result += "    for(" + m_className + " *value : " + memberName() + ") {\n";
         result += "        if(value->property(\"id\").toUInt() == id) {\n";
-        result += "             return value;\n";
-        result += "         }\n";
+        result += "            return value;\n";
+        result += "        }\n";
         result += "    }\n";
         result += "    return nullptr;\n";
         result += "}\n";
@@ -113,11 +126,11 @@ QString ClassListMember::getAccessorsSource(QString memberOf) {
         result += "void " + memberOf + "::remove" + capitalName() + "(quint32 id) {\n";
         result += "    for(int i = 0; i < " + memberName() + ".length(); i++) {\n";
         result += "        if(" + memberName() + "[i]->property(\"id\").toUInt() == id) {\n";
-        result += "             " + m_className + " *item = " + memberName() + "[i];\n";
-        result += "             " + memberName() + ".removeAt(i);\n";
-        result += "             " + notifyName() + "(" + m_namePlural + "());\n";
-        result += "              return;\n";
-        result += "         }\n";
+        result += "            " + m_className + " *item = " + memberName() + "[i];\n";
+        result += "            " + memberName() + ".removeAt(i);\n";
+        result += "            " + notifyName() + "(" + m_namePlural + "());\n";
+        result += "             return;\n";
+        result += "        }\n";
         result += "    }\n";
         result += "}\n";
         result += "\n";
